@@ -298,9 +298,12 @@ function renderAnime(items, append=false) {
   });
 }
 
-async function loadAnime(append=false) {
+
+async function loadAnime(append = false) {
   if (loading) return;
+
   loading = true;
+
   if (!append) {
     currentPage = 1;
     grid.innerHTML = "";
@@ -312,36 +315,48 @@ async function loadAnime(append=false) {
 
   try {
     let endpoint;
+
     if (currentQuery) {
       endpoint = `${API}/anime?q=${encodeURIComponent(currentQuery)}&page=${currentPage}&limit=24`;
-    } 
-} else if (currentGenre) {
-  const genreId = GENRE_IDS[currentGenre];
+    } else if (currentGenre) {
+      const genreId = GENRE_IDS[currentGenre];
 
-  if (genreId) {
-    endpoint = `${API}/anime?genres=${genreId}&page=${currentPage}&limit=24`;
-  } else {
-    endpoint = `${API}/top/anime?page=${currentPage}&limit=24`;
-  }
-} else {
-  endpoint = `${API}/top/anime?page=${currentPage}&limit=24`;
-}
+      if (!genreId) {
+        throw new Error("Genre ID not found");
+      }
 
+      endpoint = `${API}/anime?genres=${genreId}&page=${currentPage}&limit=24`;
+    } else {
+      endpoint = `${API}/top/anime?page=${currentPage}&limit=24`;
     }
+
     const response = await fetch(endpoint);
-    if (!response.ok) throw new Error("Anime API request failed");
+
+    if (!response.ok) {
+      throw new Error(`Anime API error: ${response.status}`);
+    }
+
     const result = await response.json();
     const items = result.data || [];
-    currentAnime = append ? currentAnime.concat(items) : items;
+
+    currentAnime = append
+      ? currentAnime.concat(items)
+      : items;
+
     renderAnime(items, append);
     moreBtn.classList.toggle("hidden", items.length < 10);
+
   } catch (error) {
-    statusText.textContent = "Anime data could not be loaded. Check your internet connection and try refreshing the page.";
+    console.error("Anime loading error:", error);
+    statusText.textContent =
+      "Anime could not load. Please try again later.";
     moreBtn.classList.add("hidden");
+
   } finally {
     loading = false;
   }
 }
+
 
 let searchTimer;
 search.addEventListener("input", () => {
