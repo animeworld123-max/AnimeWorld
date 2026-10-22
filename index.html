@@ -315,7 +315,14 @@ async function loadAnime(append=false) {
     if (currentQuery) {
       endpoint = `${API}/anime?q=${encodeURIComponent(currentQuery)}&page=${currentPage}&limit=24`;
     } else if (currentGenre) {
-      endpoint = `${API}/anime?genres=${encodeURIComponent(currentGenre)}&page=${currentPage}&limit=24&order_by=popularity`;
+  const genreId = GENRE_IDS[currentGenre];
+
+  if (!genreId) {
+    endpoint = `${API}/top/anime?page=${currentPage}&limit=24`;
+  } else {
+    endpoint = `${API}/anime?genres=${genreId}&page=${currentPage}&limit=24&order_by=popularity`;
+  }
+  
     } else {
       endpoint = `${API}/top/anime?page=${currentPage}&limit=24`;
     }
@@ -344,16 +351,31 @@ search.addEventListener("input", () => {
   }, 450);
 });
 
+const GENRE_IDS = {
+  Action: 1,
+  Adventure: 2,
+  Comedy: 4,
+  Drama: 8,
+  Fantasy: 10,
+  "Sci-Fi": 24,
+  Romance: 22,
+  Mystery: 7
+};
+
 document.getElementById("categories").addEventListener("click", event => {
   const button = event.target.closest("button[data-genre]");
   if (!button) return;
+
   currentGenre = button.dataset.genre;
   currentQuery = "";
   search.value = "";
-  loadAnime(false);
+
   document.getElementById("listTitle").textContent =
     currentGenre ? currentGenre + " Anime" : "Popular Anime";
+
+  loadAnime(false);
 });
+
 
 document.getElementById("menuBtn").addEventListener("click", () => {
   document.getElementById("menu").classList.toggle("open");
