@@ -3,577 +3,391 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#100d16">
-<meta name="description" content="Discover popular anime, explore genres, episode guides, Japanese and Hindi audio information, and official streaming links.">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111111">
+<meta name="description" content="Discover anime, explore details, screenshots, episodes and official viewing options on AnimeWorld.">
 <title>AnimeWorld | Discover Anime</title>
 
 <style>
-:root {
-  --bg:#100d16;
-  --panel:#1b1723;
-  --card:#241e2d;
-  --purple:#9b70ff;
-  --pink:#ff477e;
-  --muted:#b9b2c5;
-  --border:#393044;
-}
-* {box-sizing:border-box}
-html {scroll-behavior:smooth}
-body {
-  margin:0;
-  background:var(--bg);
-  color:#fff;
-  font-family:Arial,Helvetica,sans-serif;
-}
-button,input,select {font:inherit}
-button,a { -webkit-tap-highlight-color:transparent }
-a {color:inherit;text-decoration:none}
-header {
-  background:#17121f;
-  border-bottom:1px solid var(--border);
-  padding:16px;
-}
-.nav {
-  max-width:1200px;
-  margin:auto;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px;
-  flex-wrap:wrap;
-}
-.logo {
-  font-size:23px;
-  font-weight:900;
-  letter-spacing:-1px;
-}
-.logo span {color:var(--purple)}
-.navlinks {display:flex;gap:18px;color:#ddd;font-size:14px}
-.navlinks a:hover {color:var(--purple)}
-.wrap {max-width:1200px;margin:auto;padding:20px 16px}
-.hero {
-  min-height:300px;
-  border-radius:18px;
-  overflow:hidden;
-  background:linear-gradient(90deg,#171020 5%,#171020e8 45%,#17102030),
-  radial-gradient(circle at 75% 30%,#8056b9,#342144 50%,#15101d);
-  display:flex;
-  align-items:center;
-  gap:24px;
-  padding:24px;
-  position:relative;
-}
-.heroPoster {
-  width:165px;
-  height:230px;
-  flex-shrink:0;
-  object-fit:cover;
-  border-radius:10px;
-  box-shadow:0 10px 30px #0008;
-}
-.heroText {max-width:600px}
-.eyebrow {
-  color:#c7aaff;
-  font-size:12px;
-  font-weight:bold;
-  text-transform:uppercase;
-  letter-spacing:2px;
-}
-h1 {font-size:clamp(27px,5vw,44px);margin:12px 0}
-p {line-height:1.6}
-.muted {color:var(--muted);font-size:14px}
-.actions,.chips,.filters {display:flex;gap:9px;flex-wrap:wrap}
-.btn {
-  border:0;
-  padding:11px 16px;
-  border-radius:9px;
-  cursor:pointer;
-  font-weight:bold;
-  background:var(--purple);
-  color:white;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-}
-.btn.secondary {background:#393142}
-.btn:hover {filter:brightness(1.12)}
-.sectionTitle {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px;
-  margin:30px 0 16px;
-}
-.sectionTitle h2 {font-size:21px;margin:0}
-.searchBox {
-  width:100%;
-  background:var(--panel);
-  border:1px solid var(--border);
-  color:white;
-  padding:14px;
-  border-radius:10px;
-  outline:none;
-}
-.searchBox:focus {border-color:var(--purple)}
-.filters {margin-top:14px}
-.chip {
-  padding:9px 14px;
-  border:1px solid var(--border);
-  background:var(--panel);
-  color:#eee;
-  border-radius:30px;
-  cursor:pointer;
-}
-.chip.active {background:var(--purple);border-color:var(--purple)}
-.grid {
-  display:grid;
-  grid-template-columns:repeat(5,minmax(0,1fr));
-  gap:18px 14px;
-}
-.card {
-  background:var(--card);
-  border:1px solid #ffffff08;
-  border-radius:12px;
-  overflow:hidden;
-  cursor:pointer;
-  min-width:0;
-  transition:transform .18s,border-color .18s;
-}
-.card:hover {transform:translateY(-3px);border-color:#9b70ff88}
-.poster {
-  width:100%;
-  aspect-ratio:2/3;
-  object-fit:cover;
-  display:block;
-  background:#30263b;
-}
-.cardInfo {padding:10px}
-.cardInfo h3 {font-size:14px;line-height:1.4;margin:0 0 7px}
-.cardInfo p {font-size:12px;color:var(--muted);margin:0}
-.rating {color:#ffd36a!important}
-.panel {
-  background:var(--panel);
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:18px;
-  margin-top:24px;
-}
-.panel h2 {margin-top:0}
-.hidden {display:none!important}
-.detailLayout {display:flex;gap:20px}
-.detailPoster {width:145px;max-width:38%;height:max-content;border-radius:10px}
-.detailBody {flex:1;min-width:0}
-.episodeList {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
-.episode {
-  background:var(--card);
-  border:1px solid var(--border);
-  padding:11px 8px;
-  border-radius:8px;
-  font-size:13px;
-  text-align:center;
-}
-footer {
-  margin-top:40px;
-  border-top:1px solid var(--border);
-  padding:25px 16px;
-  text-align:center;
-  color:var(--muted);
-  font-size:13px;
-}
-.status {margin:14px 0;color:var(--muted);font-size:14px}
-@media(max-width:850px) {
-  .grid {grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-}
-@media(max-width:560px) {
-  .navlinks {gap:12px;font-size:12px}
-  .hero {padding:16px;gap:14px;min-height:220px}
-  .heroPoster {width:112px;height:165px}
-  .heroText h1 {font-size:24px}
-  .heroText p {font-size:12px;line-height:1.5}
-  .heroText .muted {font-size:11px}
-  .hero .btn {padding:9px 10px;font-size:12px}
-  .wrap {padding:16px 12px}
-  .grid {grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 9px}
-  .cardInfo {padding:8px}
-  .cardInfo h3 {font-size:12px}
-  .cardInfo p {font-size:11px}
-  .episodeList {grid-template-columns:repeat(3,minmax(0,1fr))}
-}
-@media(max-width:360px) {
-  .heroPoster {width:90px;height:140px}
-  .grid {grid-template-columns:repeat(2,minmax(0,1fr))}
-}
+*{box-sizing:border-box}
+:root{--bg:#111;--panel:#20282e;--purple:#9561f5;--green:#80c934;--red:#e81440;--muted:#bdbdc7}
+body{margin:0;background:var(--bg);color:#fff;font-family:Arial,Helvetica,sans-serif}
+button,input{font:inherit}
+button,a{cursor:pointer}
+button{color:inherit}
+header{background:var(--panel);padding:13px;border-bottom:1px solid #333}
+.nav{max-width:1100px;margin:auto;display:grid;grid-template-columns:46px 1fr 42px;gap:10px;align-items:center}
+.logo{text-align:center;font-weight:900;font-size:clamp(19px,5vw,30px);color:#fff;text-decoration:none;letter-spacing:-1px}
+.logo span{color:var(--purple)}
+.iconbtn{height:42px;background:transparent;border:1px solid #eee;border-radius:5px;font-size:24px}
+nav{display:none;max-width:1100px;margin:12px auto 0;gap:12px;flex-wrap:wrap}
+nav.open{display:flex}
+nav a{color:#fff;text-decoration:none;padding:8px}
+.wrap{max-width:1100px;margin:auto;padding:18px 14px}
+.search{width:100%;padding:15px;border:2px solid #9ba1a8;border-radius:5px;background:#151515;color:white;font-size:16px}
+.categories{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:18px 0 28px}
+.cat{border:0;border-radius:11px;background:var(--red);min-height:47px;padding:8px 3px;font-size:clamp(10px,3vw,14px);font-weight:bold}
+.cat.green{background:#39ae20}.cat.blue{background:#079bd7}.cat.gold{background:#df9c16}.cat.purple{background:#6540ac}
+h1{font-size:28px;line-height:1.25}
+h2{font-size:22px;margin:0}
+h3{line-height:1.4}
+.muted{color:var(--muted);line-height:1.65;font-size:14px}
+.sectionhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:27px 0 15px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 10px}
+.card{background:#202027;border:1px solid #36313d;border-radius:8px;overflow:hidden;cursor:pointer;transition:transform .18s,border-color .18s}
+.card:hover{transform:translateY(-3px);border-color:var(--purple)}
+.poster{width:100%;aspect-ratio:2/3;object-fit:cover;display:block;background:#29232f}
+.cardinfo{padding:9px}
+.cardinfo h3{font-size:13px;margin:0 0 6px}
+.cardinfo p{font-size:11px;color:#c8c5ce;margin:4px 0}
+.rating{color:#ffd16c!important}
+.hero{display:flex;align-items:center;gap:15px;padding:18px;border-radius:13px;background:linear-gradient(120deg,#21152c,#44285b);margin-bottom:27px}
+.hero img{width:110px;aspect-ratio:2/3;object-fit:cover;border-radius:7px;background:#29232f}
+.hero h1{font-size:clamp(22px,5vw,35px);margin:8px 0}
+.hero p{font-size:14px;line-height:1.6;color:#ded7e8}
+.btn{border:0;border-radius:8px;background:var(--purple);padding:12px 14px;font-weight:bold;color:white}
+.btn.secondary{background:#38333f}
+.panel{background:#19191f;border:1px solid #37313e;border-radius:10px;padding:15px;margin:20px 0}
+.panel h2{color:var(--green);margin-bottom:15px}
+.detailtop{display:flex;align-items:flex-start;gap:15px}
+.detailposter{width:120px;aspect-ratio:2/3;object-fit:cover;border-radius:7px;background:#29232f}
+.detailbody{flex:1;min-width:0}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.pill{background:#30283b;border-radius:20px;padding:7px 10px;font-size:12px}
+.gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.gallery img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:6px;background:#29232f}
+.episodes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.episode{padding:12px 4px;text-align:center;background:#29242f;border:1px solid #3c3445;border-radius:6px;font-size:12px}
+.quality{padding:17px 10px;margin:16px 0;background:#191919;border-radius:8px;text-align:center}
+.quality h3{color:var(--green);font-size:21px;margin:4px 0 8px}
+.quality p{color:#bbb;font-size:13px}
+.download{display:block;width:min(100%,330px);margin:13px auto 0;padding:14px 10px;background:linear-gradient(100deg,#40a51f,#1858a9);border:0;border-radius:4px;font-weight:bold;text-decoration:none;color:white;box-shadow:0 4px 12px #7775}
+.download.disabled{background:#38343e;box-shadow:none}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin:15px 0}
+.status{color:#c9c3d0;font-size:14px;margin:15px 0;line-height:1.6}
+.back{margin-bottom:16px}
+.hidden{display:none!important}
+footer{text-align:center;color:#aaa;padding:25px 15px;border-top:1px solid #333;margin-top:30px;font-size:12px}
+@media(min-width:600px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}.wrap{padding:24px}.hero img{width:155px}.gallery{grid-template-columns:repeat(3,minmax(0,1fr))}.categories{gap:12px}.cat{font-size:14px}}
+@media(min-width:900px){.grid{grid-template-columns:repeat(5,minmax(0,1fr))}.wrap{padding:28px}.hero img{width:170px}.episodes{grid-template-columns:repeat(6,minmax(0,1fr))}}
 </style>
 </head>
 
 <body>
 <header>
-  <nav class="nav">
-    <a class="logo" href="#">Anime<span>World</span> ✦</a>
-    <div class="navlinks">
-      <a href="#home">Home</a>
-      <a href="#catalog">Anime</a>
-      <a href="#guide">Guide</a>
-    </div>
+  <div class="nav">
+    <button class="iconbtn" id="menuBtn" aria-label="Open menu">☰</button>
+    <a class="logo" href="#" id="homeLogo">ANIME<span>WORLD</span> ✦</a>
+    <button class="iconbtn" id="searchBtn" aria-label="Go to search">⌕</button>
+  </div>
+  <nav id="menu">
+    <a href="#" id="homeLink">Home</a>
+    <a href="#catalog" id="animeLink">Anime</a>
+    <a href="#guide" id="guideLink">Watch Guide</a>
   </nav>
 </header>
 
 <main class="wrap">
-  <section class="hero" id="home">
-    <img id="heroPoster" class="heroPoster"
-      src="https://placehold.co/330x460/251b35/ffffff?text=AnimeWorld"
-      alt="Featured anime poster">
-    <div class="heroText">
-      <div class="eyebrow">Your anime destination</div>
-      <h1 id="heroTitle">Discover Your Next Anime</h1>
-      <p id="heroMeta" class="muted">Explore popular anime, stories and genres.</p>
-      <p id="heroSynopsis">Find your next favorite series in AnimeWorld.</p>
-      <div class="actions">
-        <button class="btn" id="heroExplore">Explore Anime</button>
-        <button class="btn secondary" id="heroDetails">View Details</button>
+  <div id="homePage">
+    <section class="hero">
+      <img id="heroImage" alt="Featured anime poster" src="https://placehold.co/300x450/29232f/ffffff?text=AnimeWorld">
+      <div>
+        <p style="color:#c8a4ff;font-weight:bold;letter-spacing:2px">YOUR ANIME DESTINATION</p>
+        <h1 id="heroTitle">Discover Your Next Anime</h1>
+        <p>Explore popular anime, stories and genres.</p>
+        <button class="btn" id="exploreBtn">Explore Anime</button>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section id="catalog">
-    <div class="sectionTitle">
-      <h2>Explore Anime</h2>
-      <span class="muted" id="resultCount"></span>
+    <input id="search" class="search" type="search" placeholder="Search Naruto, One Piece, Demon Slayer..." aria-label="Search anime">
+
+    <div class="categories" id="categories">
+      <button class="cat purple" data-genre="">ALL ANIME</button>
+      <button class="cat green" data-genre="Action">ACTION</button>
+      <button class="cat" data-genre="Adventure">ADVENTURE</button>
+      <button class="cat blue" data-genre="Comedy">COMEDY</button>
+      <button class="cat gold" data-genre="Fantasy">FANTASY</button>
+      <button class="cat" data-genre="Romance">ROMANCE</button>
+      <button class="cat" data-genre="Drama">DRAMA</button>
+      <button class="cat" data-genre="Sci-Fi">SCI-FI</button>
+      <button class="cat purple" data-genre="Mystery">MYSTERY</button>
     </div>
-    <input id="search" class="searchBox" type="search"
-      placeholder="Search Naruto, One Piece, Demon Slayer..."
-      aria-label="Search anime">
-    <div class="filters" id="genreFilters">
-      <button class="chip active" data-genre="All">All</button>
-      <button class="chip" data-genre="Action">Action</button>
-      <button class="chip" data-genre="Adventure">Adventure</button>
-      <button class="chip" data-genre="Comedy">Comedy</button>
-      <button class="chip" data-genre="Fantasy">Fantasy</button>
-      <button class="chip" data-genre="Romance">Romance</button>
-      <button class="chip" data-genre="Drama">Drama</button>
+
+    <div class="sectionhead">
+      <h2 id="listTitle">Popular Anime</h2>
     </div>
-    <div id="status" class="status">Loading anime posters...</div>
+    <p id="status" class="status">Loading anime posters...</p>
     <div id="grid" class="grid"></div>
-    <div class="actions" style="justify-content:center;margin-top:22px">
-      <button class="btn secondary" id="loadMore">Load More Anime</button>
-    </div>
-  </section>
+    <button id="moreBtn" class="btn secondary hidden" style="margin-top:20px;width:100%">Load More Anime</button>
+  </div>
 
-  <section id="details" class="panel hidden">
-    <div class="sectionTitle">
-      <h2>Anime Details</h2>
-      <button class="btn secondary" id="closeDetails">Close</button>
-    </div>
+  <section id="detailsPage" class="hidden">
+    <button class="btn secondary back" id="backBtn">← Back to Anime</button>
     <div id="detailContent"></div>
-    <h3>Episode Guide</h3>
-    <p class="muted">Episode listings are informational. Availability depends on the official service.</p>
-    <div id="episodes" class="episodeList"></div>
-    <p id="episodeStatus" class="status"></p>
-    <button id="moreEpisodes" class="btn secondary hidden">Load More Episodes</button>
-    <h3>Official Watch Links</h3>
-    <p class="muted">Search for this anime on licensed streaming platforms.</p>
-    <div id="watchLinks" class="actions"></div>
   </section>
 
   <section id="guide" class="panel">
-    <h2>Audio & Quality Guide</h2>
-    <p class="muted">Audio tracks and video resolutions vary by title, subscription and country. These are guides, not downloadable files.</p>
-    <div class="filters">
-      <button class="chip audio active" data-audio="All Audio">All Audio</button>
-      <button class="chip audio" data-audio="Hindi Dubbed">Hindi Dubbed</button>
-      <button class="chip audio" data-audio="Japanese Audio">Japanese Audio</button>
-    </div>
-    <p id="audioInfo" class="muted">Choose an audio category to see what to look for on official services.</p>
-    <h3>Video Quality</h3>
-    <div class="filters">
-      <button class="chip quality" data-quality="480p">480p · SD</button>
-      <button class="chip quality active" data-quality="720p">720p · HD</button>
-      <button class="chip quality" data-quality="1080p">1080p · Full HD</button>
-    </div>
-    <p id="qualityInfo" class="muted">720p is an HD resolution guide. Actual playback quality depends on the service and plan.</p>
+    <h2>Watch & Download Guide</h2>
+    <p class="muted">Choose an anime to view its details and find official viewing options. Video quality and offline-download availability depend on the licensed service, title and region.</p>
   </section>
 </main>
 
 <footer>
-  <p><strong>AnimeWorld</strong> — Discover anime and find official viewing options.</p>
-  <p>This is an independent anime discovery guide, not an official anime streaming service.</p>
-  <p>Anime artwork and metadata are supplied by MyAnimeList via the Jikan API. Availability may vary by region.</p>
+  AnimeWorld · Anime information and discovery<br>
+  Posters and metadata are supplied by an external anime database.
 </footer>
 
 <script>
 const API = "https://api.tenrai.org/v1";
 const grid = document.getElementById("grid");
-const statusBox = document.getElementById("status");
+const statusText = document.getElementById("status");
 const search = document.getElementById("search");
-const resultCount = document.getElementById("resultCount");
-
-let animeList = [];
-let selectedGenre = "All";
+const moreBtn = document.getElementById("moreBtn");
 let currentPage = 1;
-let activeAnime = null;
-let searchTimer = null;
-let episodePage = 1;
-let episodeLastPage = 1;
-let busy = false;
+let currentQuery = "";
+let currentGenre = "";
+let loading = false;
+let currentAnime = [];
 
-function escapeHTML(value) {
+function safe(value) {
   return String(value ?? "").replace(/[&<>"']/g, c => ({
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  }[c]));
+  })[c]);
 }
 
-function posterOf(anime) {
-  return anime.images?.jpg?.large_image_url ||
-    anime.images?.jpg?.image_url ||
-    "https://placehold.co/330x460/251b35/ffffff?text=Anime";
+function imageOf(anime) {
+  return anime.images?.webp?.large_image_url ||
+         anime.images?.jpg?.large_image_url ||
+         anime.images?.webp?.image_url ||
+         anime.images?.jpg?.image_url ||
+         "https://placehold.co/300x450/29232f/ffffff?text=Anime";
 }
 
 function synopsisOf(anime) {
-  return anime.synopsis || "Synopsis not available. Explore this anime on an official platform.";
+  return anime.synopsis || "No synopsis is available for this anime yet.";
 }
 
-function renderHero(anime) {
-  if (!anime) return;
-  document.getElementById("heroPoster").src = posterOf(anime);
-  document.getElementById("heroTitle").textContent =
-    anime.title_english || anime.title || "Featured Anime";
-  document.getElementById("heroMeta").textContent =
-    `${anime.year || "Year unknown"} · ${anime.type || "Anime"} · ⭐ ${anime.score || "N/A"}`;
-  document.getElementById("heroSynopsis").textContent =
-    synopsisOf(anime).slice(0, 210);
-  document.getElementById("heroDetails").onclick = () => showDetails(anime);
+function officialSearchUrl(anime) {
+  return "https://www.crunchyroll.com/search?q=" +
+    encodeURIComponent(anime.title_english || anime.title || "");
 }
 
-function renderCards(items) {
-  grid.innerHTML = "";
-  if (!items.length) {
-    statusBox.textContent = "No anime found. Try another search.";
-    resultCount.textContent = "0 results";
+function showHome() {
+  document.getElementById("homePage").classList.remove("hidden");
+  document.getElementById("detailsPage").classList.add("hidden");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function showDetails(anime) {
+  document.getElementById("homePage").classList.add("hidden");
+  document.getElementById("detailsPage").classList.remove("hidden");
+  const title = anime.title_english || anime.title || "Anime Details";
+  const image = imageOf(anime);
+  const genres = (anime.genres || []).map(g => g.name).join(", ") || "Not listed";
+  const year = anime.year || anime.aired?.prop?.from?.year || "Unknown";
+  const rating = anime.score ? "★ " + anime.score + "/10" : "Rating unavailable";
+  const episodes = anime.episodes || "Not listed";
+  const url = officialSearchUrl(anime);
+
+  document.getElementById("detailContent").innerHTML = `
+    <div class="detailtop">
+      <img class="detailposter" src="${safe(image)}" alt="${safe(title)} poster">
+      <div class="detailbody">
+        <h1>${safe(title)}</h1>
+        <p class="muted">${safe(anime.title || "")}</p>
+        <div class="meta">
+          <span class="pill">${safe(year)}</span>
+          <span class="pill">${safe(anime.type || "Anime")}</span>
+          <span class="pill">${safe(rating)}</span>
+        </div>
+        <p class="muted">Episodes: ${safe(episodes)}</p>
+        <p class="muted">Genres: ${safe(genres)}</p>
+        <div class="actions">
+          <a class="btn" style="text-decoration:none" href="${safe(url)}" target="_blank" rel="noopener">▶ Find Official Watch Options</a>
+        </div>
+      </div>
+    </div>
+
+    <section class="panel">
+      <h2>Anime Details</h2>
+      <p>${safe(synopsisOf(anime))}</p>
+      <p class="muted">Audio: Check the licensed platform for available Japanese audio and language dubs.</p>
+    </section>
+
+    <section class="panel">
+      <h2>Screenshots & Preview</h2>
+      <p class="muted">Available artwork and preview images for this anime.</p>
+      <div class="gallery">
+        <img src="${safe(image)}" alt="${safe(title)} artwork">
+        <img src="${safe(anime.trailer?.images?.maximum_image_url || image)}" alt="${safe(title)} preview">
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Season & Episode Guide</h2>
+      <p class="muted">Episode counts and season availability can vary. Open the official service to check the full episode list.</p>
+      <div id="episodeStatus" class="status">Loading episode guide...</div>
+      <div id="episodes" class="episodes"></div>
+      <a class="download" style="text-align:center" href="${safe(url)}" target="_blank" rel="noopener">View Official Episode Options</a>
+    </section>
+
+    <section class="panel">
+      <h2>Download Options</h2>
+      <p class="muted">Choose a quality to check viewing options. These buttons do not host or download video files directly. Offline downloads are available only when supported by the licensed service.</p>
+      <div class="quality">
+        <h3>480p</h3><p>SD Quality</p>
+        <a class="download" href="${safe(url)}" target="_blank" rel="noopener">Check 480p Options ↗</a>
+      </div>
+      <div class="quality">
+        <h3>720p</h3><p>HD Quality</p>
+        <a class="download" href="${safe(url)}" target="_blank" rel="noopener">Check 720p Options ↗</a>
+      </div>
+      <div class="quality">
+        <h3>1080p</h3><p>Full HD Quality</p>
+        <a class="download" href="${safe(url)}" target="_blank" rel="noopener">Check 1080p Options ↗</a>
+      </div>
+    </section>`;
+
+  window.scrollTo({top:0,behavior:"smooth"});
+  loadEpisodes(anime.mal_id);
+}
+
+async function loadEpisodes(id) {
+  const episodeStatus = document.getElementById("episodeStatus");
+  const episodesBox = document.getElementById("episodes");
+  if (!id) {
+    episodeStatus.textContent = "Episode information is unavailable.";
     return;
   }
+  try {
+    const response = await fetch(`${API}/anime/${id}/episodes?page=1`);
+    if (!response.ok) throw new Error("Episode request failed");
+    const result = await response.json();
+    const episodes = result.data || [];
+    if (!episodes.length) throw new Error("No episode data");
+    episodeStatus.textContent = "Episode guide preview";
+    episodesBox.innerHTML = episodes.slice(0,24).map((ep,i) =>
+      `<div class="episode">Episode ${safe(ep.mal_id ? (ep.episode || i+1) : i+1)}<br>${safe(ep.title || "")}</div>`
+    ).join("");
+  } catch {
+    episodeStatus.textContent = "Episode list unavailable right now. Use the official viewing link above to check episodes.";
+  }
+}
 
-  statusBox.textContent = "";
-  resultCount.textContent = `${items.length} anime`;
-
+function renderAnime(items, append=false) {
+  if (!append) grid.innerHTML = "";
+  if (!items.length && !append) {
+    statusText.textContent = "No anime found. Try another search.";
+    return;
+  }
+  statusText.textContent = "";
   items.forEach(anime => {
     const card = document.createElement("article");
     card.className = "card";
-    card.tabIndex = 0;
-    card.setAttribute("role", "button");
-    card.setAttribute("aria-label", `View ${anime.title}`);
-    const img = document.createElement("img");
-    img.className = "poster";
-    img.src = posterOf(anime);
-    img.alt = `${anime.title} poster`;
-    img.loading = "lazy";
-    img.onerror = () => {
-      img.onerror = null;
-      img.src = "https://placehold.co/330x460/251b35/ffffff?text=Anime";
-    };
-    const info = document.createElement("div");
-    info.className = "cardInfo";
-    const title = document.createElement("h3");
-    title.textContent = anime.title_english || anime.title || "Untitled Anime";
-    const meta = document.createElement("p");
-    meta.textContent = `${anime.year || "Year unknown"} · ${anime.type || "Series"}`;
-    const rating = document.createElement("p");
-    rating.className = "rating";
-    rating.style.marginTop = "6px";
-    rating.textContent = `★ ${anime.score || "N/A"}`;
-    info.append(title, meta, rating);
-    card.append(img, info);
-    card.onclick = () => showDetails(anime);
-    card.onkeydown = event => {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        showDetails(anime);
-      }
-    };
+    const img = imageOf(anime);
+    const title = anime.title_english || anime.title || "Anime";
+    card.innerHTML = `
+      <img class="poster" loading="lazy" src="${safe(img)}" alt="${safe(title)} poster">
+      <div class="cardinfo">
+        <h3>${safe(title)}</h3>
+        <p>${safe(anime.year || anime.aired?.prop?.from?.year || "Year unknown")} · ${safe(anime.type || "Anime")}</p>
+        <p class="rating">${anime.score ? "★ " + safe(anime.score) + "/10" : "Rating unavailable"}</p>
+      </div>`;
+    card.addEventListener("click", () => showDetails(anime));
     grid.appendChild(card);
   });
 }
 
-async function loadAnime(reset = false) {
-  if (busy) return;
-  busy = true;
-  if (reset) {
+async function loadAnime(append=false) {
+  if (loading) return;
+  loading = true;
+  if (!append) {
     currentPage = 1;
-    animeList = [];
     grid.innerHTML = "";
+    statusText.textContent = "Loading anime posters...";
+  } else {
+    currentPage++;
+    statusText.textContent = "Loading more anime...";
   }
-  statusBox.textContent = "Loading anime posters...";
-  const q = search.value.trim();
-  const genre = selectedGenre;
-  const page = currentPage;
-  const params = new URLSearchParams({
-    page:String(page),
-    limit:"15",
-    sfw:"true",
-    order_by:"popularity",
-    sort:"asc"
-  });
-  if (q) params.set("q", q);
-  if (genre !== "All") {
-    const genreIds = {
-      Action:1, Adventure:2, Comedy:4, Drama:8, Fantasy:10, Romance:22
-    };
-    params.set("genres", String(genreIds[genre]));
-  }
-  try {
-    const response = await fetch(`${API}/anime?${params}`);
-    if (!response.ok) throw new Error("Anime service is temporarily unavailable.");
-    const data = await response.json();
-    if (q !== search.value.trim() || genre !== selectedGenre) return;
-    const incoming = data.data || [];
-    if (reset) animeList = incoming;
-    else {
-      const known = new Set(animeList.map(a => a.mal_id));
-      animeList.push(...incoming.filter(a => !known.has(a.mal_id)));
-    }
-    renderCards(animeList);
-    if (!animeList.length) statusBox.textContent = "No results found.";
-    if (reset && animeList.length) renderHero(animeList[0]);
-    currentPage = page + 1;
-  } catch (error) {
-    statusBox.textContent = "Could not load anime right now. Check your internet and try again.";
-  } finally {
-    busy = false;
-  }
-}
 
-async function showDetails(anime) {
-  activeAnime = anime;
-  episodePage = 1;
-  episodeLastPage = 1;
-  document.getElementById("details").classList.remove("hidden");
-  document.getElementById("detailContent").innerHTML = `
-    <div class="detailLayout">
-      <img class="detailPoster" src="${escapeHTML(posterOf(anime))}" alt="Anime poster">
-      <div class="detailBody">
-        <h2>${escapeHTML(anime.title_english || anime.title)}</h2>
-        <p class="muted">${escapeHTML(anime.type || "Anime")} · ${escapeHTML(anime.year || "Year unknown")} · ${escapeHTML(anime.status || "")}</p>
-        <p class="muted">⭐ ${escapeHTML(anime.score || "N/A")} · Episodes: ${escapeHTML(anime.episodes || "Unknown")}</p>
-        <p>${escapeHTML(synopsisOf(anime))}</p>
-        <p class="muted">Genres: ${escapeHTML((anime.genres || []).map(g => g.name).join(", ") || "Not listed")}</p>
-      </div>
-    </div>`;
-  document.getElementById("watchLinks").innerHTML = "";
-  const links = [
-    ["Crunchyroll", `https://www.crunchyroll.com/search?q=${encodeURIComponent(anime.title)}`],
-    ["Netflix", "https://www.netflix.com/"],
-    ["Prime Video", "https://www.primevideo.com/"],
-    ["Official site / sources", anime.url || "https://myanimelist.net/"]
-  ];
-  links.forEach(([label, url]) => {
-    const a = document.createElement("a");
-    a.className = "btn secondary";
-    a.textContent = label;
-    a.href = url;
-    a.target = "_blank";
-    a.rel = "noopener noreferrer";
-    document.getElementById("watchLinks").appendChild(a);
-  });
-  document.getElementById("episodes").innerHTML = "";
-  document.getElementById("episodeStatus").textContent = "Loading episode guide...";
-  document.getElementById("moreEpisodes").classList.add("hidden");
-  document.getElementById("details").scrollIntoView({behavior:"smooth"});
-  await loadEpisodes();
-}
-
-async function loadEpisodes() {
-  if (!activeAnime) return;
-  const anime = activeAnime;
-  const page = episodePage;
   try {
-    const response = await fetch(`${API}/anime/${anime.mal_id}/episodes?page=${page}`);
-    if (!response.ok) throw new Error("Episode list unavailable");
-    const data = await response.json();
-    if (!activeAnime || activeAnime.mal_id !== anime.mal_id) return;
-    const episodes = data.data || [];
-    episodeLastPage = data.pagination?.last_visible_page || page;
-    const list = document.getElementById("episodes");
-    if (page === 1) list.innerHTML = "";
-    if (!episodes.length && page === 1) {
-      document.getElementById("episodeStatus").textContent =
-        "Episode guide is not available for this title.";
+    let endpoint;
+    if (currentQuery) {
+      endpoint = `${API}/anime?q=${encodeURIComponent(currentQuery)}&page=${currentPage}&limit=24`;
+    } else if (currentGenre) {
+      endpoint = `${API}/anime?genres=${encodeURIComponent(currentGenre)}&page=${currentPage}&limit=24&order_by=popularity`;
     } else {
-      episodes.forEach((ep, index) => {
-        const item = document.createElement("div");
-        item.className = "episode";
-        const number = ep.mal_id ? ((page - 1) * 100 + index + 1) : ((page - 1) * 100 + index + 1);
-        item.textContent = `Episode ${number}${ep.title ? ": " + ep.title : ""}`;
-        list.appendChild(item);
-      });
-      document.getElementById("episodeStatus").textContent =
-        "Episode titles and availability may vary by source.";
+      endpoint = `${API}/top/anime?page=${currentPage}&limit=24`;
     }
-    document.getElementById("moreEpisodes").classList.toggle("hidden", page >= episodeLastPage || episodes.length === 0);
+    const response = await fetch(endpoint);
+    if (!response.ok) throw new Error("Anime API request failed");
+    const result = await response.json();
+    const items = result.data || [];
+    currentAnime = append ? currentAnime.concat(items) : items;
+    renderAnime(items, append);
+    moreBtn.classList.toggle("hidden", items.length < 10);
   } catch (error) {
-    document.getElementById("episodeStatus").textContent =
-      "Episode guide could not load. Try again later.";
+    statusText.textContent = "Anime data could not be loaded. Check your internet connection and try refreshing the page.";
+    moreBtn.classList.add("hidden");
+  } finally {
+    loading = false;
   }
 }
 
-document.getElementById("moreEpisodes").onclick = () => {
-  if (episodePage < episodeLastPage) {
-    episodePage++;
-    loadEpisodes();
-  }
-};
-
-document.getElementById("closeDetails").onclick = () => {
-  document.getElementById("details").classList.add("hidden");
-  activeAnime = null;
-};
-
-document.getElementById("heroExplore").onclick = () =>
-  document.getElementById("catalog").scrollIntoView({behavior:"smooth"});
-
+let searchTimer;
 search.addEventListener("input", () => {
   clearTimeout(searchTimer);
-  searchTimer = setTimeout(() => loadAnime(true), 550);
+  searchTimer = setTimeout(() => {
+    currentQuery = search.value.trim();
+    currentGenre = "";
+    loadAnime(false);
+  }, 450);
 });
 
-document.getElementById("genreFilters").addEventListener("click", event => {
-  const button = event.target.closest("[data-genre]");
+document.getElementById("categories").addEventListener("click", event => {
+  const button = event.target.closest("button[data-genre]");
   if (!button) return;
-  document.querySelectorAll("[data-genre]").forEach(b => b.classList.remove("active"));
-  button.classList.add("active");
-  selectedGenre = button.dataset.genre;
-  loadAnime(true);
+  currentGenre = button.dataset.genre;
+  currentQuery = "";
+  search.value = "";
+  loadAnime(false);
+  document.getElementById("listTitle").textContent =
+    currentGenre ? currentGenre + " Anime" : "Popular Anime";
 });
 
-document.getElementById("loadMore").onclick = () => loadAnime(false);
-
-document.querySelectorAll(".audio").forEach(button => {
-  button.onclick = () => {
-    document.querySelectorAll(".audio").forEach(b => b.classList.remove("active"));
-    button.classList.add("active");
-    const messages = {
-      "All Audio":"Check the selected anime's official listing for available language tracks.",
-      "Hindi Dubbed":"Hindi dubbing is not available for every anime. Confirm language options on the licensed platform.",
-      "Japanese Audio":"Japanese audio is commonly offered for many anime, but availability varies by title and region."
-    };
-    document.getElementById("audioInfo").textContent = messages[button.dataset.audio];
-  };
+document.getElementById("menuBtn").addEventListener("click", () => {
+  document.getElementById("menu").classList.toggle("open");
 });
-
-document.querySelectorAll(".quality").forEach(button => {
-  button.onclick = () => {
-    document.querySelectorAll(".quality").forEach(b => b.classList.remove("active"));
-    button.classList.add("active");
-    const messages = {
-      "480p":"480p is standard-definition quality. Actual playback options depend on the service.",
-      "720p":"720p is an HD resolution guide. Actual playback quality depends on the service and plan.",
-      "1080p":"1080p is Full HD. Availability depends on the title, subscription and device."
-    };
-    document.getElementById("qualityInfo").textContent = messages[button.dataset.quality];
-  };
+document.getElementById("searchBtn").addEventListener("click", () => {
+  document.getElementById("search").focus();
+  window.scrollTo({top:0,behavior:"smooth"});
 });
+document.getElementById("exploreBtn").addEventListener("click", () => {
+  document.getElementById("catalog")?.scrollIntoView({behavior:"smooth"});
+  document.getElementById("search").focus();
+});
+document.getElementById("homeLink").addEventListener("click", event => {
+  event.preventDefault();
+  showHome();
+});
+document.getElementById("homeLogo").addEventListener("click", event => {
+  event.preventDefault();
+  showHome();
+});
+document.getElementById("animeLink").addEventListener("click", event => {
+  event.preventDefault();
+  showHome();
+  grid.scrollIntoView({behavior:"smooth"});
+});
+document.getElementById("guideLink").addEventListener("click", event => {
+  event.preventDefault();
+  document.getElementById("guide").scrollIntoView({behavior:"smooth"});
+});
+document.getElementById("backBtn").addEventListener("click", showHome);
+moreBtn.addEventListener("click", () => loadAnime(true));
 
-loadAnime(true);
+loadAnime();
 </script>
 </body>
-     </html>
-       
+  </html>
+  
