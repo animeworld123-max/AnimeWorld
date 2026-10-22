@@ -314,17 +314,19 @@ async function loadAnime(append=false) {
     let endpoint;
     if (currentQuery) {
       endpoint = `${API}/anime?q=${encodeURIComponent(currentQuery)}&page=${currentPage}&limit=24`;
-    } else if (currentGenre) {
+    } 
+} else if (currentGenre) {
   const genreId = GENRE_IDS[currentGenre];
 
-  if (!genreId) {
-    endpoint = `${API}/top/anime?page=${currentPage}&limit=24`;
+  if (genreId) {
+    endpoint = `${API}/anime?genres=${genreId}&page=${currentPage}&limit=24`;
   } else {
-    endpoint = `${API}/anime?genres=${genreId}&page=${currentPage}&limit=24&order_by=popularity`;
+    endpoint = `${API}/top/anime?page=${currentPage}&limit=24`;
   }
-  
-    } else {
-      endpoint = `${API}/top/anime?page=${currentPage}&limit=24`;
+} else {
+  endpoint = `${API}/top/anime?page=${currentPage}&limit=24`;
+}
+
     }
     const response = await fetch(endpoint);
     if (!response.ok) throw new Error("Anime API request failed");
