@@ -178,79 +178,157 @@ function showHome() {
   window.scrollTo({top:0,behavior:"smooth"});
 }
 
+
 function showDetails(anime) {
   document.getElementById("homePage").classList.add("hidden");
   document.getElementById("detailsPage").classList.remove("hidden");
+
   const title = anime.title_english || anime.title || "Anime Details";
   const image = imageOf(anime);
   const genres = (anime.genres || []).map(g => g.name).join(", ") || "Not listed";
   const year = anime.year || anime.aired?.prop?.from?.year || "Unknown";
-  const rating = anime.score ? "★ " + anime.score + "/10" : "Rating unavailable";
+  const rating = anime.score ? anime.score + "/10" : "Not available";
   const episodes = anime.episodes || "Not listed";
   const url = officialSearchUrl(anime);
 
+  // ADD YOUR OWN LEGALLY HOSTED VIDEO LINKS HERE.
+  // Use the exact anime title in lowercase as the key.
+  const CUSTOM_VIDEO_LINKS = {
+    /*
+    "solo leveling": [
+      {
+        episode: 1,
+        language: "Japanese",
+        subtitles: "English",
+        links: {
+          "480p": "https://your-own-video-link.example/episode1-480",
+          "720p": "https://your-own-video-link.example/episode1-720",
+          "1080p": "https://your-own-video-link.example/episode1-1080"
+        }
+      }
+    ]
+    */
+  };
+
+  const key = title.toLowerCase();
+  const hostedEpisodes = CUSTOM_VIDEO_LINKS[key] || [];
+
+  function validVideoUrl(value) {
+    try {
+      const parsed = new URL(value);
+      return parsed.protocol === "https:" ? parsed.href : "";
+    } catch {
+      return "";
+    }
+  }
+
+  const hostedHtml = hostedEpisodes.length
+    ? hostedEpisodes.map(ep => `
+        <div class="panel">
+          <h3>Episode ${safe(ep.episode)}</h3>
+          <p class="muted">
+            Language: ${safe(ep.language || "Not specified")}<br>
+            Subtitles: ${safe(ep.subtitles || "Not specified")}
+          </p>
+          <div class="actions">
+            ${Object.entries(ep.links || {}).map(([quality, link]) => {
+              const safeUrl = validVideoUrl(link);
+              return safeUrl
+                ? `<a class="btn" style="text-decoration:none"
+                     href="${safe(safeUrl)}"
+                     target="_blank" rel="noopener">
+                     Watch ${safe(quality)}
+                   </a>`
+                : "";
+            }).join("")}
+          </div>
+        </div>
+      `).join("")
+    : `<p class="status">
+         No personal video links added yet.
+         Add your legally hosted links in CUSTOM_VIDEO_LINKS
+         inside showDetails().
+       </p>`;
+
   document.getElementById("detailContent").innerHTML = `
     <div class="detailtop">
-      <img class="detailposter" src="${safe(image)}" alt="${safe(title)} poster">
+      <img class="detailposter"
+           src="${safe(image)}"
+           alt="${safe(title)} poster">
+
       <div class="detailbody">
         <h1>${safe(title)}</h1>
         <p class="muted">${safe(anime.title || "")}</p>
+
         <div class="meta">
-          <span class="pill">${safe(year)}</span>
+          <span class="pill">Year: ${safe(year)}</span>
           <span class="pill">${safe(anime.type || "Anime")}</span>
-          <span class="pill">${safe(rating)}</span>
+          <span class="pill">★ ${safe(rating)}</span>
         </div>
+
         <p class="muted">Episodes: ${safe(episodes)}</p>
         <p class="muted">Genres: ${safe(genres)}</p>
+
         <div class="actions">
-          <a class="btn" style="text-decoration:none" href="${safe(url)}" target="_blank" rel="noopener">▶ Find Official Watch Options</a>
+          <a class="btn"
+             style="text-decoration:none"
+             href="${safe(url)}"
+             target="_blank" rel="noopener">
+            Find Official Watch Options ↗
+          </a>
         </div>
       </div>
     </div>
 
     <section class="panel">
-      <h2>Anime Details</h2>
+      <h2>Anime Info</h2>
       <p>${safe(synopsisOf(anime))}</p>
-      <p class="muted">Audio: Check the licensed platform for available Japanese audio and language dubs.</p>
+      <p class="muted">
+        Language: Check the video source for available audio.
+      </p>
+      <p class="muted">
+        Subtitles: Check the video source for subtitle availability.
+      </p>
+      <p class="muted">
+        Format and quality depend on your hosted video files.
+      </p>
     </section>
 
     <section class="panel">
-      <h2>Screenshots & Preview</h2>
-      <p class="muted">Available artwork and preview images for this anime.</p>
-      <div class="gallery">
-        <img src="${safe(image)}" alt="${safe(title)} artwork">
-        <img src="${safe(anime.trailer?.images?.maximum_image_url || image)}" alt="${safe(title)} preview">
+      <h2>Your Episodes & Video Links</h2>
+      <p class="muted">
+        Watch episodes using your own legally hosted video links.
+      </p>
+      ${hostedHtml}
+    </section>
+
+    <section class="panel">
+      <h2>Episode Guide</h2>
+      <div id="episodeStatus" class="status">
+        Loading episode guide...
       </div>
-    </section>
-
-    <section class="panel">
-      <h2>Season & Episode Guide</h2>
-      <p class="muted">Episode counts and season availability can vary. Open the official service to check the full episode list.</p>
-      <div id="episodeStatus" class="status">Loading episode guide...</div>
       <div id="episodes" class="episodes"></div>
-      <a class="download" style="text-align:center" href="${safe(url)}" target="_blank" rel="noopener">View Official Episode Options</a>
     </section>
 
     <section class="panel">
-      <h2>Download Options</h2>
-      <p class="muted">Choose a quality to check viewing options. These buttons do not host or download video files directly. Offline downloads are available only when supported by the licensed service.</p>
-      <div class="quality">
-        <h3>480p</h3><p>SD Quality</p>
-        <a class="download" href="${safe(url)}" target="_blank" rel="noopener">Check 480p Options ↗</a>
-      </div>
-      <div class="quality">
-        <h3>720p</h3><p>HD Quality</p>
-        <a class="download" href="${safe(url)}" target="_blank" rel="noopener">Check 720p Options ↗</a>
-      </div>
-      <div class="quality">
-        <h3>1080p</h3><p>Full HD Quality</p>
-        <a class="download" href="${safe(url)}" target="_blank" rel="noopener">Check 1080p Options ↗</a>
-      </div>
-    </section>`;
+      <h2>Official Viewing Options</h2>
+      <p class="muted">
+        Check licensed streaming services for additional episodes,
+        language options and supported offline viewing.
+      </p>
+      <a class="download"
+         style="text-align:center"
+         href="${safe(url)}"
+         target="_blank" rel="noopener">
+        Find Official Options ↗
+      </a>
+    </section>
+  `;
 
-  window.scrollTo({top:0,behavior:"smooth"});
+  window.scrollTo({ top: 0, behavior: "smooth" });
   loadEpisodes(anime.mal_id);
 }
+
 
 async function loadEpisodes(id) {
   const episodeStatus = document.getElementById("episodeStatus");
