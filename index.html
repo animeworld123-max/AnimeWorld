@@ -3,56 +3,191 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AnimeWorld</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AnimeWorld | Anime Guide</title>
 <style>
+:root{--bg:#0b0b12;--panel:#171522;--purple:#a78bfa;--muted:#aaa5bd}
 *{box-sizing:border-box}
-body{margin:0;background:#100d1c;color:#fff;font-family:Arial,sans-serif}
-header{background:#211638;padding:22px 16px;text-align:center}
-h1{color:#c4a2ff;margin:0}
-header p{color:#ddd}
-input{width:90%;max-width:500px;padding:14px;border-radius:10px;border:1px solid #8c65c9;font-size:16px}
-main{padding:18px;max-width:1000px;margin:auto}
-h2{color:#d2b9ff}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px}
-.card{background:#251b38;padding:16px;border-radius:12px;text-align:center}
-.poster{font-size:55px}
-.card h3{margin:8px 0}
-.card p{color:#ddd;font-size:14px}
-a{color:#d2b9ff}
-footer{text-align:center;padding:25px;color:#bbb}
+body{margin:0;background:var(--bg);color:#fff;font-family:Arial,sans-serif}
+header{background:linear-gradient(120deg,#291449,#10101d);padding:22px 16px}
+nav{display:flex;align-items:center;justify-content:space-between;max-width:1100px;margin:auto}
+.logo{font-size:25px;font-weight:800;color:#d6c2ff}
+nav a{color:#fff;text-decoration:none}
+.hero{max-width:1100px;margin:35px auto 10px}
+.hero h1{font-size:clamp(30px,6vw,48px);margin:0 0 10px}
+.hero p{color:#d2cbe2}
+.search{width:100%;padding:15px;border:1px solid #8e6be0;border-radius:12px;font-size:16px;margin:14px 0}
+main{max-width:1100px;margin:auto;padding:20px 15px}
+.tools{display:flex;flex-wrap:wrap;gap:9px;margin:12px 0 24px}
+button,select{background:#211b31;color:white;border:1px solid #4b3b66;border-radius:9px;padding:10px 12px;font-size:14px}
+button.active{background:#7750c8}
+h2{font-size:23px}
+.muted{color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.card{background:var(--panel);border:1px solid #292338;border-radius:12px;overflow:hidden;cursor:pointer}
+.card img{width:100%;height:225px;object-fit:cover;background:#282033;display:block}
+.cardbody{padding:11px}
+.card h3{font-size:16px;margin:3px 0 8px}
+.card p{font-size:13px;color:var(--muted);margin:0 0 9px}
+.tag{display:inline-block;background:#322548;padding:5px 7px;border-radius:6px;font-size:12px;margin:2px}
+.primary{background:#7045bd;border:0}
+.panel{background:var(--panel);padding:16px;border-radius:12px;margin:22px 0}
+.episode{display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid #332b40;padding:12px 0}
+.episode:last-child{border:0}
+.episode small{display:block;color:var(--muted);margin-top:5px}
+.links{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+a.btn{display:inline-block;background:#7045bd;color:#fff;text-decoration:none;padding:11px;border-radius:8px;font-size:14px}
+footer{text-align:center;padding:28px;color:var(--muted);font-size:13px}
+.hidden{display:none}
+@media(min-width:650px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}.card img{height:260px}}
 </style>
 </head>
 <body>
 <header>
-<h1>🎌 AnimeWorld</h1>
-<p>Discover your next favorite anime!</p>
-<input id="search" placeholder="Search anime..." oninput="filterAnime()">
+<nav><div class="logo">🎌 AnimeWorld</div><a href="#catalog">Explore Anime</a></nav>
+<div class="hero">
+<h1>Discover Your Next Anime</h1>
+<p>Anime posters, episode guides, genres and official watch links.</p>
+<input id="search" class="search" placeholder="Search Naruto, One Piece..." aria-label="Search anime">
+<div class="tools">
+<button class="active" data-audio="All">All Audio</button>
+<button data-audio="Hindi Dubbed">Hindi Dubbed</button>
+<button data-audio="Japanese">Japanese</button>
+</div>
+</div>
 </header>
 <main>
+<section id="catalog">
 <h2>Popular Anime</h2>
-<div class="grid" id="animeList">
-<div class="card"><div class="poster">🍥</div><h3>Naruto</h3><p>Action · Adventure</p><a href="https://naruto-official.com/en" target="_blank">Official Website</a></div>
-<div class="card"><div class="poster">🏴‍☠️</div><h3>One Piece</h3><p>Adventure · Fantasy</p><a href="https://one-piece.com/" target="_blank">Official Website</a></div>
-<div class="card"><div class="poster">⚔️</div><h3>Demon Slayer</h3><p>Action · Fantasy</p><a href="https://demonslayer-anime.com/" target="_blank">Official Website</a></div>
-<div class="card"><div class="poster">👊</div><h3>Jujutsu Kaisen</h3><p>Action · Supernatural</p><a href="https://jujutsukaisen.jp/" target="_blank">Official Website</a></div>
-<div class="card"><div class="poster">🦸</div><h3>My Hero Academia</h3><p>Action · Superhero</p><a href="https://heroaca.com/" target="_blank">Official Website</a></div>
-<div class="card"><div class="poster">🕵️</div><h3>Spy x Family</h3><p>Comedy · Family</p><a href="https://spy-family.net/" target="_blank">Official Website</a></div>
-<div class="card"><div class="poster">🌟</div><h3>Frieren</h3><p>Fantasy · Adventure</p><a href="https://frieren-anime.jp/" target="_blank">Official Website</a></div>
-<div class="card"><div class="poster">🏐</div><h3>Haikyu!!</h3><p>Sports · Drama</p><a href="https://haikyu.jp/" target="_blank">Official Website</a></div>
+<p class="muted" id="status">Loading anime posters...</p>
+<div id="grid" class="grid"></div>
+</section>
+<section id="details" class="panel hidden">
+<button id="back">← Back to anime</button>
+<div id="detailContent"></div>
+</section>
+<section class="panel">
+<h2>Video Quality Guide</h2>
+<p class="muted">Choose a quality to see what it means. Actual resolution and audio tracks depend on the licensed service and your plan.</p>
+<div class="tools">
+<button data-quality="480p">480p · SD</button>
+<button data-quality="720p">720p · HD</button>
+<button data-quality="1080p">1080p · Full HD</button>
 </div>
-<h2>Where to Watch Anime</h2>
-<p>Find licensed anime on <a href="https://www.crunchyroll.com/" target="_blank">Crunchyroll</a>. Availability depends on your region.</p>
+<p id="qualityInfo" class="muted">Select a quality above.</p>
+</section>
+<section class="panel">
+<h2>Watch Anime Legally</h2>
+<p class="muted">Find licensed episodes and check whether Hindi audio or Japanese audio is available in your region.</p>
+<div class="links">
+<a class="btn" href="https://www.crunchyroll.com/" target="_blank" rel="noopener">Crunchyroll</a>
+<a class="btn" href="https://www.netflix.com/" target="_blank" rel="noopener">Netflix</a>
+<a class="btn" href="https://www.primevideo.com/" target="_blank" rel="noopener">Prime Video</a>
+</div>
+</section>
 </main>
-<footer>© AnimeWorld · Anime information and official links</footer>
+<footer>© AnimeWorld · Anime information and official viewing links</footer>
 <script>
-function filterAnime(){
-let q=document.getElementById('search').value.toLowerCase();
-document.querySelectorAll('.card').forEach(card=>{
-card.style.display=card.innerText.toLowerCase().includes(q)?'block':'none';
-});
+const grid=document.getElementById('grid');
+const statusText=document.getElementById('status');
+const search=document.getElementById('search');
+const details=document.getElementById('details');
+const detailContent=document.getElementById('detailContent');
+let animeList=[];
+let audioMode='All';
+let searchTimer;
+
+function esc(s=''){
+ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
+function officialSearch(title){
+ return 'https://www.crunchyroll.com/search?q='+encodeURIComponent(title);
+}
+function draw(list){
+ animeList=list;
+ grid.innerHTML='';
+ if(!list.length){statusText.textContent='No anime found. Try another search.';return}
+ statusText.textContent=list.length+' anime shown';
+ list.forEach(a=>{
+  const title=a.title_english||a.title||'Anime';
+  const img=a.images?.jpg?.large_image_url||a.images?.jpg?.image_url||'';
+  const card=document.createElement('article');
+  card.className='card';
+  card.innerHTML='<img loading="lazy" src="'+esc(img)+'" alt="'+esc(title)+' poster"><div class="cardbody"><h3>'+esc(title)+'</h3><p>'+esc(a.type||'Anime')+' · '+esc(a.episodes||'?')+' episodes</p><span class="tag">Japanese</span><span class="tag">Hindi dub: check service</span><br><button class="primary" style="margin-top:10px">View episodes</button></div>';
+  card.querySelector('button').addEventListener('click',()=>showDetails(a));
+  card.addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')showDetails(a)});
+  grid.appendChild(card);
+ });
+}
+async function loadPopular(){
+ try{
+  const r=await fetch('https://api.jikan.moe/v4/top/anime?filter=bypopularity&limit=12');
+  if(!r.ok)throw Error('Anime API unavailable');
+  const j=await r.json();
+  draw(j.data||[]);
+ }catch(e){
+  statusText.textContent='Could not load posters. Check internet and refresh.';
+ }
+}
+async function runSearch(q){
+ if(!q.trim()){loadPopular();return}
+ statusText.textContent='Searching...';
+ try{
+  const r=await fetch('https://api.jikan.moe/v4/anime?q='+encodeURIComponent(q)+'&limit=12');
+  if(!r.ok)throw Error('Search unavailable');
+  const j=await r.json();draw(j.data||[]);
+ }catch(e){statusText.textContent='Search failed. Please try again.'}
+}
+search.addEventListener('input',()=>{
+ clearTimeout(searchTimer);
+ searchTimer=setTimeout(()=>runSearch(search.value),650);
+});
+document.querySelectorAll('[data-audio]').forEach(b=>{
+ b.addEventListener('click',()=>{
+  audioMode=b.dataset.audio;
+  document.querySelectorAll('[data-audio]').forEach(x=>x.classList.toggle('active',x===b));
+  document.getElementById('qualityInfo').textContent=
+   audioMode==='All'?'Showing anime across audio categories.':
+   audioMode+' selected. Audio availability must be checked on each official service.';
+ });
+});
+document.querySelectorAll('[data-quality]').forEach(b=>{
+ b.addEventListener('click',()=>{
+  document.getElementById('qualityInfo').textContent=
+   b.dataset.quality+' selected. This is a preference guide, not a download link or a guarantee of resolution.';
+ });
+});
+document.getElementById('back').addEventListener('click',()=>{
+ details.classList.add('hidden');
+ document.getElementById('catalog').classList.remove('hidden');
+ window.scrollTo({top:0,behavior:'smooth'});
+});
+async function showDetails(a){
+ const title=a.title_english||a.title||'Anime';
+ document.getElementById('catalog').classList.add('hidden');
+ details.classList.remove('hidden');
+ detailContent.innerHTML='<h2>'+esc(title)+'</h2><p class="muted">Loading episode guide...</p>';
+ window.scrollTo({top:0,behavior:'smooth'});
+ let episodes=[];
+ try{
+  const r=await fetch('https://api.jikan.moe/v4/anime/'+a.mal_id+'/episodes?page=1');
+  if(r.ok){const j=await r.json();episodes=j.data||[]}
+ }catch(e){}
+ const summary=esc(a.synopsis||'Synopsis not available.');
+ const image=a.images?.jpg?.large_image_url||'';
+ detailContent.innerHTML=
+ '<h2>'+esc(title)+'</h2>'+
+ (image?'<img src="'+esc(image)+'" alt="'+esc(title)+' poster" style="width:145px;max-height:220px;object-fit:cover;border-radius:10px;float:left;margin:0 14px 12px 0">':'')+
+ '<p>'+summary+'</p><p class="muted">Episodes listed: '+esc(a.episodes||'Not confirmed')+' · Audio: check service availability</p>'+
+ '<div style="clear:both"></div><h3>Season / Episode Guide</h3>'+
+ '<p class="muted">The API may only list some episodes. Season groupings can vary by release.</p>'+
+ (episodes.length?episodes.map(ep=>'<div class="episode"><div><strong>Episode '+esc(ep.mal_id?ep.mal_id:ep.episode||'?')+'</strong><small>'+esc(ep.title||'Episode information')+'</small></div><span class="tag">'+(ep.filler?'Filler':ep.recap?'Recap':'Episode guide')+'</span></div>').join(''):'<p class="muted">Episode list is currently unavailable for this title.</p>')+
+ '<div class="links"><a class="btn" href="'+officialSearch(title)+'" target="_blank" rel="noopener">Find official watch options</a>'+
+ (a.url?'<a class="btn" href="'+esc(a.url)+'" target="_blank" rel="noopener">Anime information</a>':'')+'</div>'+
+ '<p class="muted">Hindi audio, Japanese audio, offline downloads and resolution depend on the licensed platform and region. AnimeWorld does not host episode files.</p>';
+}
+loadPopular();
 </script>
 </body>
   </html>
-                                                                                           
+  
