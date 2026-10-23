@@ -517,6 +517,71 @@ const supabaseClient = window.supabase.createClient(
 
 console.log("Supabase client initialized");
 </script>
+<div id="adminLogin" class="panel hidden">
+  <h2>AnimeWorld Admin Login</h2>
+  <p class="muted">Sirf authorized admin ke liye.</p>
+
+  <input
+    id="adminEmail"
+    class="search"
+    type="email"
+    placeholder="Admin email"
+    autocomplete="username"
+  >
+
+  <input
+    id="adminPassword"
+    class="search"
+    type="password"
+    placeholder="Password"
+    autocomplete="current-password"
+    style="margin-top:12px"
+  >
+
+  <button id="adminLoginBtn" class="btn" style="margin-top:12px">
+    Login
+  </button>
+
+  <p id="adminMessage" class="status"></p>
+</div>
+<script>
+document.getElementById("adminLoginBtn").addEventListener("click", async () => {
+  const email = document.getElementById("adminEmail").value.trim();
+  const password = document.getElementById("adminPassword").value;
+  const message = document.getElementById("adminMessage");
+
+  if (!email || !password) {
+    message.textContent = "Email aur password bharo.";
+    return;
+  }
+
+  message.textContent = "Login ho raha hai...";
+
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if (error) {
+    message.textContent = "Login failed: " + error.message;
+    return;
+  }
+
+  const { data: admin, error: adminError } = await supabaseClient
+    .from("animeworld_admins")
+    .select("user_id")
+    .eq("user_id", data.user.id)
+    .maybeSingle();
+
+  if (adminError || !admin) {
+    await supabaseClient.auth.signOut();
+    message.textContent = "Is account ko admin permission nahi hai.";
+    return;
+  }
+
+  message.textContent = "Admin login successful!";
+});
+</script>
 </body>
   </html>
   
