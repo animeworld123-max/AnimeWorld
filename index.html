@@ -71,6 +71,7 @@ footer{text-align:center;color:#aaa;padding:25px 15px;border-top:1px solid #333;
 @media(min-width:600px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}.wrap{padding:24px}.hero img{width:155px}.gallery{grid-template-columns:repeat(3,minmax(0,1fr))}.categories{gap:12px}.cat{font-size:14px}}
 @media(min-width:900px){.grid{grid-template-columns:repeat(5,minmax(0,1fr))}.wrap{padding:28px}.hero img{width:170px}.episodes{grid-template-columns:repeat(6,minmax(0,1fr))}}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
@@ -504,6 +505,17 @@ document.getElementById("backBtn").addEventListener("click", showHome);
 moreBtn.addEventListener("click", () => loadAnime(true));
 
 loadAnime();
+</script>
+<script>
+const SUPABASE_URL = "https://ogvkxppyprqxwqddvozo.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_2AuJjamdpKaSR8KnvWzUUw_U_v1plQr";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
+
+console.log("Supabase client initialized");
 </script>
 </body>
   </html>
