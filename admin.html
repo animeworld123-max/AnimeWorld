@@ -1,0 +1,168 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AnimeWorld Admin</title>
+<style>
+body{margin:0;padding:20px;background:#101014;color:#eee;font-family:Arial,sans-serif}
+main{max-width:600px;margin:auto}
+.card{background:#1c1b22;padding:20px;border-radius:16px;border:1px solid #393641;margin:18px 0}
+h1,h2{color:#8bd344}
+input,textarea,button{box-sizing:border-box;width:100%;padding:13px;margin:8px 0;border-radius:8px;font-size:16px}
+input,textarea{background:#111;color:white;border:1px solid #555}
+button{background:#8b5cf6;color:white;border:0;font-weight:bold}
+#status{white-space:pre-wrap;overflow-wrap:anywhere}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<main>
+<h1>AnimeWorld Admin</h1>
+
+<section class="card" id="loginBox">
+<h2>Admin Login</h2>
+<input id="email" type="email" placeholder="Admin email" autocomplete="username">
+<input id="password" type="password" placeholder="Password" autocomplete="current-password">
+<button id="loginBtn">Login</button>
+</section>
+
+<section class="card hidden" id="formBox">
+<h2>Add Anime</h2>
+<form id="animeForm">
+<input id="title" placeholder="Anime title" required>
+<input id="poster" type="url" placeholder="Poster image URL (https://...)" required>
+<textarea id="synopsis" placeholder="Anime story / synopsis" rows="4"></textarea>
+<input id="genre" placeholder="Genre (e.g. Action, Fantasy)">
+<input id="year" type="number" placeholder="Release year" min="1900" max="2100">
+<button type="submit">Save Anime</button>
+</form>
+<button id="logoutBtn" type="button">Logout</button>
+</section>
+
+<p id="status" role="status">Enter your admin login details.</p>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://ogvkxppyprqxwqddvozo.supabase.co";
+const SUPABASE_KEY = "sb_publishable_2AuJjamdpKaSR8KnvWzUUw_U_v1plQr";
+
+const client = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+const statusBox = document.getElementById("status");
+const loginBox = document.getElementById("loginBox");
+const formBox = document.getElementById("formBox");
+
+async function checkAdmin() {
+  const { data: { user } } = await client.auth.getUser();
+
+  if (!user) {
+    loginBox.classList.remove("hidden");
+    formBox.classList.add("hidden");
+    return;
+  }
+
+  const { data, error } = await client
+    .from("animeworld_admins")
+    .select("user_id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (error || !data) {
+    await client.auth.signOut();
+    loginBox.classList.remove("hidden");
+    formBox.classList.add("hidden");
+    statusBox.textContent =
+      "Admin permission nahi mili. Supabase ke animeworld_admins table mein apna user_id check karo.";
+    return;
+  }
+
+  loginBox.classList.add("hidden");
+  formBox.classList.remove("hidden");
+  statusBox.textContent = "Admin verified. Anime add kar sakte ho.";
+}
+
+document.getElementById("loginBtn").addEventListener("click", async () => {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  if (!email || !password) {
+    statusBox.textContent = "Email aur password bharo.";
+    return;
+  }
+
+  statusBox.textContent = "Login ho raha hai...";
+
+  const { error } = await client.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if (error) {
+    statusBox.textContent = "Login error: " + error.message;
+    return;
+  }
+
+  await checkAdmin();
+});
+
+document.getElementById("animeForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  statusBox.textContent = "Anime save ho raha hai...";
+
+  const { data: { user } } = await client.auth.getUser();
+
+  if (!user) {
+    statusBox.textContent = "Pehle login karo.";
+    return;
+  }
+
+  const { data: admin, error: adminError } = await client
+    .from("animeworld_admins")
+    .select("user_id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (adminError || !admin) {
+    statusBox.textContent = "Admin permission verify nahi hui.";
+    return;
+  }
+
+  const yearValue = document.getElementById("year").value;
+
+  const anime = {
+    title: document.getElementById("title").value.trim(),
+    poster_url: document.getElementById("poster").value.trim(),
+    synopsis: document.getElementById("synopsis").value.trim() || null,
+    genre: document.getElementById("genre").value.trim() || null,
+    release_year: yearValue ? Number(yearValue) : null
+  };
+
+  const { error } = await client
+    .from("anime_titles")
+    .insert(anime);
+
+  if (error) {
+    statusBox.textContent = "Save error: " + error.message;
+    return;
+  }
+
+  document.getElementById("animeForm").reset();
+  statusBox.textContent = "Anime successfully save ho gaya!";
+});
+
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+  await client.auth.signOut();
+  await checkAdmin();
+  statusBox.textContent = "Logout ho gaya.";
+});
+
+checkAdmin();
+</script>
+</body>
+</html>
