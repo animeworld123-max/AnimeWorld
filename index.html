@@ -376,8 +376,6 @@ function renderAnime(items, append=false) {
     grid.appendChild(card);
   });
 }
-
-
 async function loadAnime(append = false) {
   if (loading) return;
 
@@ -386,6 +384,7 @@ async function loadAnime(append = false) {
   if (!append) {
     currentPage = 1;
     grid.innerHTML = "";
+    currentAnime = [];
     statusText.textContent = "Loading anime posters...";
   } else {
     currentPage++;
@@ -399,44 +398,84 @@ async function loadAnime(append = false) {
       endpoint = `${API}/anime?q=${encodeURIComponent(currentQuery)}&page=${currentPage}&limit=24`;
     } else if (currentGenre) {
       const genreId = GENRE_IDS[currentGenre];
-
-      if (!genreId) {
-        throw new Error("Genre ID not found");
-      }
-
+      if (!genreId) throw new Error("Genre ID not found");
       endpoint = `${API}/anime?genres=${genreId}&page=${currentPage}&limit=24`;
     } else {
       endpoint = `${API}/top/anime?page=${currentPage}&limit=24`;
     }
 
     const response = await fetch(endpoint);
-
-    if (!response.ok) {
-      throw new Error(`Anime API error: ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`Anime API error: ${response.status}`);
 
     const result = await response.json();
-    const items = result.data || [];
+    let items = result.data || [];
 
-    currentAnime = append
-      ? currentAnime.concat(items)
-      : items;
+    // Fetch anime saved by admin in Supabase
+    const { data: savedAnime, error: dbError } = await supabaseClient
+      .from("anime_titles")
+      .select("*")
+      .order("created_at", { ascending: false });
 
+    if (dbError) {
+      console.error("Supabase loading error:", dbError);
+    } else {
+      const customItems = (savedAnime || []).map(row => ({
+        mal_id: `custom-${row.id}`,
+        title: row.title,
+        title_english: row.title,
+        synopsis: row.synopsis || "",
+        year: row.release_year || null,
+        type: "Anime",
+        score: null,
+        genres: row.genre
+          ? row.genre.split(",").map(name => ({ name: name.trim() }))
+          : [],
+        images: {
+          jpg: {
+            large_image_url: row.poster_url || "",
+            image_url: row.poster_url || ""
+          }
+        }
+      }));
+
+      // Search and genre filters also apply to saved anime
+      const filteredCustom = customItems.filter(anime => {
+        const matchesQuery = !currentQuery ||
+          anime.title.toLowerCase().includes(currentQuery.toLowerCase());
+
+        const matchesGenre = !currentGenre ||
+          anime.genres.some(g =>
+            g.name.toLowerCase().includes(currentGenre.toLowerCase())
+          );
+
+        return matchesQuery && matchesGenre;
+      });
+
+      // Put admin-added anime first; avoid duplicate titles
+      const existingTitles = new Set(
+        items.map(a => (a.title_english || a.title || "").toLowerCase())
+      );
+
+      items = [
+        ...filteredCustom.filter(a =>
+          !existingTitles.has(a.title.toLowerCase())
+        ),
+        ...items
+      ];
+    }
+
+    currentAnime = append ? currentAnime.concat(items) : items;
     renderAnime(items, append);
     moreBtn.classList.toggle("hidden", items.length < 10);
 
   } catch (error) {
     console.error("Anime loading error:", error);
-    statusText.textContent =
-      "Anime could not load. Please try again later.";
+    statusText.textContent = "Anime could not load. Please try again later.";
     moreBtn.classList.add("hidden");
-
   } finally {
     loading = false;
   }
 }
-
-
 let searchTimer;
 search.addEventListener("input", () => {
   clearTimeout(searchTimer);
