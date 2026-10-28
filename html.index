@@ -56,6 +56,31 @@ h3{line-height:1.4}
 .pill{background:#30283b;border-radius:20px;padding:7px 10px;font-size:12px}
 .gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .gallery img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:6px;background:#29232f}
+.pagination{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:10px;
+  margin:35px 0;
+}
+.page-btn{
+  min-width:42px;
+  height:44px;
+  padding:0 12px;
+  border:0;
+  border-radius:5px;
+  background:transparent;
+  color:#2196d2;
+  font-weight:bold;
+}
+.page-btn.active{
+  background:#ff0;
+  color:#111;
+}
+.page-btn:disabled{
+  opacity:.4;
+}
 .episodes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .episode{padding:12px 4px;text-align:center;background:#29242f;border:1px solid #3c3445;border-radius:6px;font-size:12px}
 .quality{padding:17px 10px;margin:16px 0;background:#191919;border-radius:8px;text-align:center}
@@ -119,7 +144,7 @@ footer{text-align:center;color:#aaa;padding:25px 15px;border-top:1px solid #333;
     </div>
     <p id="status" class="status">Loading anime posters...</p>
     <div id="grid" class="grid"></div>
-    <button id="moreBtn" class="btn secondary hidden" style="margin-top:20px;width:100%">Load More Anime</button>
+    <div id="pagination" class="pagination"></div>
   </div>
 
   <section id="detailsPage" class="hidden">
