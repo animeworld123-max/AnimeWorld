@@ -401,38 +401,81 @@ function renderAnime(items, append=false) {
     grid.appendChild(card);
   });
 }
-async function loadAnime(append = false) {
+function renderPagination() {
+  const pagination = document.getElementById("pagination");
+  pagination.innerHTML = "";
+
+  const prev = document.createElement("button");
+  prev.className = "page-btn";
+  prev.textContent = "Previous";
+  prev.disabled = currentPage <= 1;
+  prev.onclick = () => {
+    if (currentPage > 1) {
+      currentPage--;
+      loadAnime(true);
+    }
+  };
+  pagination.appendChild(prev);
+
+  for (let page = 1; page <= totalPages; page++) {
+    const btn = document.createElement("button");
+    btn.className = "page-btn";
+    btn.textContent = page;
+    btn.classList.toggle("active", page === currentPage);
+    btn.onclick = () => {
+      currentPage = page;
+      loadAnime(true);
+    };
+    pagination.appendChild(btn);
+  }
+
+  const next = document.createElement("button");
+  next.className = "page-btn";
+  next.textContent = "Next";
+  next.disabled = currentPage >= totalPages;
+  next.onclick = () => {
+    if (currentPage < totalPages) {
+      currentPage++;
+      loadAnime(true);
+    }
+  };
+  pagination.appendChild(next);
+  }
+  async function loadAnime(append = false) {
   if (loading) return;
 
   loading = true;
 
   if (!append) {
-    currentPage = 1;
-    grid.innerHTML = "";
-    currentAnime = [];
-    statusText.textContent = "Loading anime posters...";
-  } else {
-    currentPage++;
-    statusText.textContent = "Loading more anime...";
-  }
+  currentPage = 1;
+}
+
+grid.innerHTML = "";
+currentAnime = [];
+statusText.textContent = "Loading anime posters...";
 
   try {
     let endpoint;
 
     if (currentQuery) {
-      endpoint = `${API}/anime?q=${encodeURIComponent(currentQuery)}&page=${currentPage}&limit=24`;
+     endpoint = `${API}/anime?q=${encodeURIComponent(currentQuery)}&page=${currentPage}&limit=20`;
     } else if (currentGenre) {
       const genreId = GENRE_IDS[currentGenre];
       if (!genreId) throw new Error("Genre ID not found");
-      endpoint = `${API}/anime?genres=${genreId}&page=${currentPage}&limit=24`;
+      endpoint = `${API}/anime?genres=${genreId}&page=${currentPage}&limit=20`;
     } else {
-      endpoint = `${API}/top/anime?page=${currentPage}&limit=24`;
+      endpoint = `${API}/top/anime?page=${currentPage}&limit=20`;
     }
-
     const response = await fetch(endpoint);
     if (!response.ok) throw new Error(`Anime API error: ${response.status}`);
 
     const result = await response.json();
+    totalPages = result.pagination?.last_visible_page
+  || result.pagination?.last_page
+  || result.meta?.pagination?.total_pages
+  || (result.data?.length === 20 ? currentPage + 1 : currentPage);
+
+renderPagination();
     let items = result.data || [];
 
     // Fetch anime saved by admin in Supabase
