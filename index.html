@@ -436,7 +436,7 @@ async function loadAnime(append = false) {
 
     // Fetch anime saved by admin in Supabase
     const { data: savedAnime, error: dbError } = await supabaseClient
-      .from("anime_titles")
+      .from("anime")
       .select("*")
       .order("created_at", { ascending: false });
 
@@ -490,12 +490,9 @@ async function loadAnime(append = false) {
 
     currentAnime = append ? currentAnime.concat(items) : items;
     renderAnime(items, append);
-    moreBtn.classList.toggle("hidden", items.length < 10);
-
   } catch (error) {
     console.error("Anime loading error:", error);
     statusText.textContent = "Anime could not load. Please try again later.";
-    moreBtn.classList.add("hidden");
   } finally {
     loading = false;
   }
@@ -565,8 +562,6 @@ document.getElementById("guideLink").addEventListener("click", event => {
   document.getElementById("guide").scrollIntoView({behavior:"smooth"});
 });
 document.getElementById("backBtn").addEventListener("click", showHome);
-moreBtn.addEventListener("click", () => loadAnime(true));
-
 loadAnime();
 </script>
 <script>
