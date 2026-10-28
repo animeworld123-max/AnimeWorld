@@ -56,31 +56,54 @@ h3{line-height:1.4}
 .pill{background:#30283b;border-radius:20px;padding:7px 10px;font-size:12px}
 .gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .gallery img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:6px;background:#29232f}
-.pagination{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  flex-wrap:wrap;
-  gap:10px;
-  margin:35px 0;
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 35px 0;
+  padding: 0 10px;
+  width: 100%;
+  box-sizing: border-box;
 }
-.page-btn{
-  min-width:42px;
-  height:44px;
-  padding:0 12px;
-  border:0;
-  border-radius:5px;
-  background:transparent;
-  color:#2196d2;
-  font-weight:bold;
+
+.page-btn {
+  min-width: 42px;
+  height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #2196d2;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
 }
-.page-btn.active{
-  background:#ff0;
-  color:#111;
+
+.page-btn.active {
+  min-width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  background: #ff0;
+  color: #111;
+  font-size: 20px;
 }
-.page-btn:disabled{
-  opacity:.4;
+
+.page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
+
+.page-btn.next-btn {
+  min-width: 160px;
+  height: 80px;
+  border: 3px solid #bdbdbd;
+  border-radius: 8px;
+  background: transparent;
+  color: #2196d2;
+  font-size: 18px;
+      }
 .episodes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .episode{padding:12px 4px;text-align:center;background:#29242f;border:1px solid #3c3445;border-radius:6px;font-size:12px}
 .quality{padding:17px 10px;margin:16px 0;background:#191919;border-radius:8px;text-align:center}
@@ -416,22 +439,50 @@ function renderPagination() {
     }
   };
   pagination.appendChild(prev);
+const pages = new Set([
+  1,
+  2,
+  3,
+  4,
+  totalPages
+]);
 
-  for (let page = 1; page <= totalPages; page++) {
-    const btn = document.createElement("button");
-    btn.className = "page-btn";
-    btn.textContent = page;
-    btn.classList.toggle("active", page === currentPage);
-    btn.onclick = () => {
-      currentPage = page;
-      loadAnime(true);
-    };
-    pagination.appendChild(btn);
+if (currentPage > 4) {
+  pages.add(currentPage - 1);
+  pages.add(currentPage);
+}
+
+const sortedPages = [...pages]
+  .filter(page => page >= 1 && page <= totalPages)
+  .sort((a, b) => a - b);
+
+let previousPage = 0;
+
+sortedPages.forEach(page => {
+  if (page > previousPage + 1) {
+    const dots = document.createElement("span");
+    dots.textContent = "...";
+    dots.style.color = "#fff";
+    pagination.appendChild(dots);
   }
 
+  const btn = document.createElement("button");
+  btn.className = "page-btn";
+  btn.textContent = page;
+  btn.classList.toggle("active", page === currentPage);
+
+  btn.onclick = () => {
+    currentPage = page;
+    loadAnime(true);
+  };
+
+  pagination.appendChild(btn);
+  previousPage = page;
+});
+
   const next = document.createElement("button");
-  next.className = "page-btn";
-  next.textContent = "Next";
+  next.className = "page-btn next-btn";
+  next.textContent = "NEXT  ›";
   next.disabled = currentPage >= totalPages;
   next.onclick = () => {
     if (currentPage < totalPages) {
