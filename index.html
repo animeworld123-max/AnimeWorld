@@ -553,74 +553,224 @@ const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_PUBLISHABLE_KEY
 );
-
 console.log("Supabase client initialized");
 </script>
 <div id="adminLogin" class="panel">
   <h2>AnimeWorld Admin Login</h2>
   <p class="muted">Sirf authorized admin ke liye.</p>
-
-  <input
-    id="adminEmail"
-    class="search"
-    type="email"
-    placeholder="Admin email"
-    autocomplete="username"
-  >
-
-  <input
-    id="adminPassword"
-    class="search"
-    type="password"
-    placeholder="Password"
-    autocomplete="current-password"
-    style="margin-top:12px"
-  >
-
+  <input id="adminEmail" class="search" type="email"
+    placeholder="Admin email" autocomplete="username">
+  <input id="adminPassword" class="search" type="password"
+    placeholder="Password" autocomplete="current-password"
+    style="margin-top:12px">
   <button id="adminLoginBtn" class="btn" style="margin-top:12px">
     Login
   </button>
-
   <p id="adminMessage" class="status"></p>
 </div>
+
+<div id="adminTools" class="panel" hidden>
+  <h2>AnimeWorld Admin Panel</h2>
+  <p>Admin login successful!</p>
+
+  <hr>
+  <h3>Upload Anime Screenshot</h3>
+  <input id="animeScreenshot" class="search" type="file"
+    accept="image/*">
+  <button id="uploadScreenshotBtn" class="btn"
+    style="margin-top:12px">Upload Screenshot</button>
+  <p id="uploadMessage" class="status"></p>
+  <input id="screenshotUrl" class="search"
+    placeholder="Uploaded screenshot URL" readonly
+    style="margin-top:8px">
+
+  <hr>
+  <h3>Add Episode Download Link</h3>
+  <input id="episodeAnimeTitle" class="search"
+    placeholder="Anime title (exact title)" required>
+
+  <input id="episodeNumber" class="search" type="number"
+    min="1" placeholder="Episode number"
+    style="margin-top:10px" required>
+
+  <input id="episodeTitle" class="search"
+    placeholder="Episode title (optional)"
+    style="margin-top:10px">
+
+  <input id="episodeDownloadUrl" class="search" type="url"
+    placeholder="Authorized download URL (https://...)"
+    style="margin-top:10px" required>
+
+  <button id="addEpisodeBtn" class="btn"
+    style="margin-top:12px">Save Episode</button>
+  <p id="episodeMessage" class="status"></p>
+
+  <button id="adminLogoutBtn" class="btn"
+    style="margin-top:16px">Logout</button>
+</div>
 <script>
-document.getElementById("adminLoginBtn").addEventListener("click", async () => {
-  const email = document.getElementById("adminEmail").value.trim();
-  const password = document.getElementById("adminPassword").value;
-  const message = document.getElementById("adminMessage");
+(() => {
+  const loginBox = document.getElementById("adminLogin");
+  const toolsBox = document.getElementById("adminTools");
+  const loginMessage = document.getElementById("adminMessage");
 
-  if (!email || !password) {
-    message.textContent = "Email aur password bharo.";
-    return;
-  }
+  const showLoggedOut = () => {
+    loginBox.hidden = false;
+    toolsBox.hidden = true;
+  };
 
-  message.textContent = "Login ho raha hai...";
+  const showLoggedIn = () => {
+    loginBox.hidden = true;
+    toolsBox.hidden = false;
+  };
 
-  const { data, error } = await supabaseClient.auth.signInWithPassword({
-    email,
-    password
+  document.getElementById("adminLoginBtn").addEventListener("click", async () => {
+    const email = document.getElementById("adminEmail").value.trim();
+    const password = document.getElementById("adminPassword").value;
+
+    if (!email || !password) {
+      loginMessage.textContent = "Email aur password bharo.";
+      return;
+    }
+
+    loginMessage.textContent = "Login ho raha hai...";
+
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) {
+      loginMessage.textContent = "Login failed: " + error.message;
+      return;
+    }
+
+    const { data: admin, error: adminError } = await supabaseClient
+      .from("animeworld_admins")
+      .select("user_id")
+      .eq("user_id", data.user.id)
+      .maybeSingle();
+
+    if (adminError || !admin) {
+      await supabaseClient.auth.signOut();
+      loginMessage.textContent = "Is account ko admin permission nahi hai.";
+      showLoggedOut();
+      return;
+    }
+
+    loginMessage.textContent = "Admin login successful!";
+    showLoggedIn();
   });
 
-  if (error) {
-    message.textContent = "Login failed: " + error.message;
-    return;
-  }
+  document.getElementById("uploadScreenshotBtn").addEventListener("click", async () => {
+    const message = document.getElementById("uploadMessage");
+    const file = document.getElementById("animeScreenshot").files[0];
+    const urlInput = document.getElementById("screenshotUrl");
 
-  const { data: admin, error: adminError } = await supabaseClient
-    .from("animeworld_admins")
-    .select("user_id")
-    .eq("user_id", data.user.id)
-    .maybeSingle();
+    if (!file) {
+      message.textContent = "Pehle screenshot image select karo.";
+      return;
+    }
 
-  if (adminError || !admin) {
+    if (!file.type.startsWith("image/")) {
+      message.textContent = "Sirf image file upload kar sakte ho.";
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      message.textContent = "Image 5 MB se chhoti honi chahiye.";
+      return;
+    }
+
+    message.textContent = "Screenshot upload ho raha hai...";
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const filePath = Date.now() + "-" + safeName;
+
+    const { error } = await supabaseClient.storage
+      .from("anime-screenshots")
+      .upload(filePath, file, {
+        contentType: file.type,
+        upsert: false
+      });
+
+    if (error) {
+      message.textContent = "Upload failed: " + error.message;
+      return;
+    }
+
+    const { data } = supabaseClient.storage
+      .from("anime-screenshots")
+      .getPublicUrl(filePath);
+
+    urlInput.value = data.publicUrl;
+    message.textContent = "Upload successful! URL copy karke save kar lo.";
+  });
+
+  document.getElementById("addEpisodeBtn").addEventListener("click", async () => {
+    const message = document.getElementById("episodeMessage");
+    const animeTitle = document.getElementById("episodeAnimeTitle").value.trim();
+    const episodeNumber = Number(document.getElementById("episodeNumber").value);
+    const episodeTitle = document.getElementById("episodeTitle").value.trim();
+    const downloadUrl = document.getElementById("episodeDownloadUrl").value.trim();
+
+    if (!animeTitle || !Number.isInteger(episodeNumber) || episodeNumber < 1 || !downloadUrl) {
+      message.textContent = "Anime title, valid episode number aur download URL bharo.";
+      return;
+    }
+
+    try {
+      const parsedUrl = new URL(downloadUrl);
+      if (parsedUrl.protocol !== "https:") {
+        message.textContent = "Security ke liye HTTPS link use karo.";
+        return;
+      }
+    } catch {
+      message.textContent = "Valid download URL dalo.";
+      return;
+    }
+
+    message.textContent = "Episode save ho raha hai...";
+
+    const { error } = await supabaseClient
+      .from("anime_episodes")
+      .insert({
+        anime_title: animeTitle,
+        episode_number: episodeNumber,
+        episode_title: episodeTitle || null,
+        download_url: downloadUrl
+      });
+
+    if (error) {
+      message.textContent = "Save failed: " + error.message;
+      return;
+    }
+
+    message.textContent = "Episode database mein save ho gaya!";
+    document.getElementById("episodeNumber").value = "";
+    document.getElementById("episodeTitle").value = "";
+    document.getElementById("episodeDownloadUrl").value = "";
+  });
+
+  document.getElementById("adminLogoutBtn").addEventListener("click", async () => {
     await supabaseClient.auth.signOut();
-    message.textContent = "Is account ko admin permission nahi hai.";
-    return;
-  }
+    showLoggedOut();
+    document.getElementById("adminPassword").value = "";
+    loginMessage.textContent = "Logout successful.";
+  });
 
-  message.textContent = "Admin login successful!";
-});
+  supabaseClient.auth.getSession().then(async ({ data }) => {
+    if (!data.session) return;
+
+    const { data: admin, error } = await supabaseClient
+      .from("animeworld_admins")
+      .select("user_id")
+      .eq("user_id", data.session.user.id)
+      .maybeSingle();
+
+    if (!error && admin) showLoggedIn();
+    else showLoggedOut();
+  });
+})();
 </script>
 </body>
-  </html>
-  
+</html>
